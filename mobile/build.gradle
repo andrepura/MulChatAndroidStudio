@@ -36,11 +36,9 @@ dependencies {
     wearApp project(':wear')
     compile 'com.android.support:appcompat-v7:22.0.0'
     compile 'com.google.android.gms:play-services:7.0.0'
-
     compile 'com.github.nkzawa:socket.io-client:0.3.0'
-
-
     //Android annotations via apt
     apt "org.androidannotations:androidannotations:$AAVersion"
     compile "org.androidannotations:androidannotations-api:$AAVersion"
+    compile project(':json')
 }

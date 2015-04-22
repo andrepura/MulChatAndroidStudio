@@ -1,1 +1,3 @@
 include ':mobile', ':wear'
+include ':json'
+project(':json').projectDir = new File(settingsDir, '../ViennaMaps/json')
