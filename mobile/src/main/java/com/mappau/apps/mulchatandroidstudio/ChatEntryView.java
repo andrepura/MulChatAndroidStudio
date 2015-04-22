@@ -14,17 +14,17 @@ import org.androidannotations.annotations.ViewById;
 @EViewGroup(R.layout.item)
 public class ChatEntryView extends LinearLayout{
     @ViewById
-    TextView txtName;
+    public TextView txtName;
 
     @ViewById
-    TextView txtMsg;
+    public TextView txtMsg;
 
     public ChatEntryView(Context context){
         super(context);
     }
 
     public void bind(ChatEntry entry){
-        txtName.setText(entry.sender.getName());
-        txtMsg.setText(entry.msg);
+        txtName.setText(entry.getSender().getName());
+        txtMsg.setText(entry.getMsg());
     }
 }
