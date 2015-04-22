@@ -2,11 +2,14 @@ package com.mappau.apps.mulchatandroidstudio;
 
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.WindowManager;
+import android.widget.EditText;
 import android.widget.ListView;
 import android.widget.Toast;
 
 import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
+import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
 import org.androidannotations.annotations.Fullscreen;
 import org.androidannotations.annotations.ItemClick;
@@ -27,6 +30,9 @@ public class MainActivity extends ActionBarActivity implements Websocket.WebSock
 
     @ViewById
     ListView listView;
+
+    @ViewById
+    EditText editText;
 
     @Bean
     ChatEntryAdapter adapter;
@@ -49,7 +55,7 @@ public class MainActivity extends ActionBarActivity implements Websocket.WebSock
 
     @ItemClick
     void listViewItemClicked(ChatEntry entry){
-        showMsg("CLICK"+entry.getMid());
+        showMsg("CLICK" + entry.getMid());
     }
 
     @UiThread
@@ -63,9 +69,29 @@ public class MainActivity extends ActionBarActivity implements Websocket.WebSock
         Toast.makeText(getApplicationContext(),msg,Toast.LENGTH_LONG).show();
     }
 
+    @Click
+    void button(){
+        Log.d(TAG,"click");
+        try{
+            JSONObject obj = new JSONObject();
+            obj.put("sender", sender.toJSONObj());
+            obj.put("msg", editText.getText().toString());
+            websocket.emitChatMessage(obj);
+            editText.setText("");
+        } catch(Exception e){
+            Log.e(TAG,"ERROR: "+e.toString());
+        }
+    }
+
     @UiThread
     void newChatEntry(ChatEntry entry){
         adapter.addElement(entry);
+        listView.post(new Runnable() {
+            @Override
+            public void run() {
+                listView.setSelection(adapter.getCount()-1);
+            }
+        });
     }
 
     @Override
@@ -99,7 +125,6 @@ public class MainActivity extends ActionBarActivity implements Websocket.WebSock
 
     @Override
     public void onConnectionError() {
-
         showMsg("ERROR:connection");
         Log.e(TAG, "ERROR: connection");
     }

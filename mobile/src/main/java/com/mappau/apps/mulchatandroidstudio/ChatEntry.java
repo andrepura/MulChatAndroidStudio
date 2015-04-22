@@ -11,7 +11,7 @@ import java.util.Date;
  * Created by guru on 21.04.2015.
  */
 
-public class ChatEntry {
+public class ChatEntry implements Comparable<ChatEntry>{
 
 
     String mid;
@@ -107,5 +107,12 @@ public class ChatEntry {
             entry.setMsg(msg);
 
         return entry;
+    }
+
+
+    @Override
+    public int compareTo(ChatEntry entry) {
+        long diff = getTimestamp().getTime() - entry.getTimestamp().getTime();
+        return diff<0?-1:diff==0?0:1;
     }
 }

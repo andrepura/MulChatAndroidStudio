@@ -15,5 +15,7 @@
         android:text="New Text"
         android:id="@+id/txtMsg"
         android:layout_gravity="right"
+        android:paddingLeft="10dp"
         android:layout_weight="1" />
+
 </LinearLayout>

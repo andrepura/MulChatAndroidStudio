@@ -12,8 +12,6 @@ import org.androidannotations.annotations.RootContext;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
 
 /**
  * Created by guru on 22.04.2015.
@@ -22,7 +20,7 @@ import java.util.List;
 public class ChatEntryAdapter extends BaseAdapter{
     public static final String TAG = "ChatEntryAdapter";
 
-    List<ChatEntry> entries;
+    ArrayList<ChatEntry> entries;
 
     @RootContext
     Context context;
@@ -30,6 +28,7 @@ public class ChatEntryAdapter extends BaseAdapter{
     @AfterInject
     void initAdapter(){
         entries = new ArrayList<>();
+
     }
 
     @Override
@@ -50,11 +49,8 @@ public class ChatEntryAdapter extends BaseAdapter{
     @Override
     public View getView(int i, View view, ViewGroup viewGroup) {
         ChatEntryView chatEntryView;
-        if(view == null){
-            chatEntryView = ChatEntryView_.build(context);
-        } else {
-            chatEntryView = (ChatEntryView) view;
-        }
+
+        chatEntryView = ChatEntryView_.build(context);
 
         chatEntryView.bind(entries.get(i));
 
@@ -70,12 +66,8 @@ public class ChatEntryAdapter extends BaseAdapter{
             }
         }
         entries.add(entry);
-        Collections.sort(entries, new Comparator<ChatEntry>() {
-            @Override
-            public int compare(ChatEntry entry, ChatEntry t1) {
-                return (int) (entry.getTimestamp().getTime() - t1.getTimestamp().getTime());
-            }
-        });
+        Collections.sort(entries);
+
         notifyDataSetChanged();
     }
 }
