@@ -1,7 +1,9 @@
 package com.mappau.apps.mulchatandroidstudio;
 
 import android.content.Context;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.BaseAdapter;
@@ -17,57 +19,67 @@ import java.util.Collections;
  * Created by guru on 22.04.2015.
  */
 @EBean
-public class ChatEntryAdapter extends BaseAdapter{
-    public static final String TAG = "ChatEntryAdapter";
+public class ChatEntryAdapter extends RecyclerView.Adapter<ViewWrapper>{
 
-    ArrayList<ChatEntry> entries;
+    public static int TYPE_ME = 0;
+    public static int TYPE_OTHER = 1;
+
+    public static final String TAG = "ChatEntryAdapter";
 
     @RootContext
     Context context;
 
-    @AfterInject
-    void initAdapter(){
-        entries = new ArrayList<>();
+    Sender sender;
 
-    }
-
-    @Override
-    public int getCount() {
-        return entries.size();
-    }
-
-    @Override
-    public Object getItem(int i) {
-        return entries.get(i);
-    }
-
-    @Override
-    public long getItemId(int i) {
-        return i;
-    }
-
-    @Override
-    public View getView(int i, View view, ViewGroup viewGroup) {
-        ChatEntryView chatEntryView;
-
-        chatEntryView = ChatEntryView_.build(context);
-
-        chatEntryView.bind(entries.get(i));
-
-        return chatEntryView;
-    }
+    ArrayList<ChatEntry> items = new ArrayList<>();
 
     public void addElement(ChatEntry entry){
         Log.d(TAG, "addElement: " + entry.getMid());
-        for(ChatEntry e : entries){
+        for(ChatEntry e : items){
             if(e.getMid().equals(entry.getMid())){
                 Log.d(TAG, "element in array");
                 return;
             }
         }
-        entries.add(entry);
-        Collections.sort(entries);
+        items.add(entry);
+        Collections.sort(items);
 
         notifyDataSetChanged();
+    }
+
+    public void  setSender(Sender sender){
+        this.sender = sender;
+    }
+
+    @Override
+    public ViewWrapper onCreateViewHolder(ViewGroup parent, int viewType) {
+
+        View itemView = LayoutInflater.
+                from(context).
+                inflate(viewType == TYPE_OTHER ? R.layout.carditem : R.layout.carditemme,
+                        parent ,
+                        false);
+        ViewWrapper holder = new ViewWrapper(itemView);
+        return holder;
+    }
+
+    @Override
+    public void onBindViewHolder(ViewWrapper holder, int position) {
+        holder.bind(items.get(position));
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        ChatEntry entry = items.get(position);
+        if(sender == null) return  TYPE_OTHER;
+        if(entry.getSender().getSid().equals(sender.getSid())){
+            return TYPE_ME;
+        }
+        return TYPE_OTHER;
+    }
+
+    @Override
+    public int getItemCount() {
+        return items.size();
     }
 }
