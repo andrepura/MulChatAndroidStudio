@@ -4,5 +4,10 @@
     <string name="app_name">MulChatAndroidStudio</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="name_pref">Gib deinen Text ein!</string>
+    <string name="name">name</string>
+    <string name="name_default">andre</string>
+    <string name="open">Open</string>
+    <string name="close">Close</string>
 
 </resources>

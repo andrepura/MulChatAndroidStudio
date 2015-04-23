@@ -1,11 +1,13 @@
 package com.mappau.apps.mulchatandroidstudio;
 
-import android.app.Activity;
-import android.graphics.Outline;
-import android.support.v7.app.ActionBarActivity;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Gravity;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -14,7 +16,7 @@ import org.androidannotations.annotations.AfterViews;
 import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
-import org.androidannotations.annotations.Fullscreen;
+import org.androidannotations.annotations.FragmentById;
 import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 import org.json.JSONObject;
@@ -22,16 +24,24 @@ import org.json.JSONObject;
 import java.util.UUID;
 
 
-@EActivity(R.layout.activity_main)
-@Fullscreen
-public class MainActivity extends Activity implements Websocket.WebSocketCallback {
+@EActivity(R.layout.main)
+public class MainActivity extends AppCompatActivity implements Websocket.WebSocketCallback, DrawerUpdate{
     public static final String TAG = "MAINACTIVITY";
     Sender sender;
     Websocket websocket;
+
     LinearLayoutManager layoutManager;
 
     @ViewById
-    RecyclerView recycleView;
+    RecyclerView sideMenu;
+
+    @ViewById
+    DrawerLayout drawer;
+
+    ActionBarDrawerToggle drawerToggle;
+
+//    @Pref
+//    MyPrefs_ myPrefs;
 
     @ViewById
     EditText editText;
@@ -39,14 +49,24 @@ public class MainActivity extends Activity implements Websocket.WebSocketCallbac
     @ViewById
     Button fabbutton;
 
+    @ViewById
+    Toolbar toolbar;
+
+    @FragmentById
+    ChatListFragment chatlist;
+
     @Bean
-    ChatEntryAdapter adapter;
+    MenuEntryAdapter adapter;
+
+
 
     @AfterViews
     void connectToWebsocket() {
         Log.d(TAG, "connect to webserver ...");
+//        sender = new Sender(UUID.randomUUID().toString(), myPrefs.name().getOr("andre"));
         sender = new Sender(UUID.randomUUID().toString(), "andre");
-        adapter.setSender(sender);
+
+        chatlist.setSender(sender);
         websocket = new Websocket(this, "http://mul.pura.at");
         try {
             websocket.init();
@@ -56,17 +76,22 @@ public class MainActivity extends Activity implements Websocket.WebSocketCallbac
     }
 
     @AfterViews
-    void bindAdapter() {
+    void initToolbar() {
         layoutManager = new LinearLayoutManager(getApplicationContext());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-        recycleView.setLayoutManager(layoutManager);
-        recycleView.setAdapter(adapter);
+        sideMenu.setLayoutManager(layoutManager);
+        sideMenu.setAdapter(adapter);
 
-    }
+        setSupportActionBar(toolbar);
 
-    @UiThread
-    void updateUI(String msg) {
+        drawerToggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.open, R.string.close);
+        drawer.setDrawerListener(drawerToggle);
+        drawerToggle.syncState();
 
+        adapter.addElement(new MenuEntryAdapter.MenuEntry("Settings", R.drawable.ic_launcher));
+        adapter.addElement(new MenuEntryAdapter.MenuEntry("Irgendwas", R.drawable.ic_launcher));
+
+        adapter.setDrawerCallback(this);
     }
 
     @UiThread
@@ -89,10 +114,9 @@ public class MainActivity extends Activity implements Websocket.WebSocketCallbac
         }
     }
 
-    @UiThread
-    void newChatEntry(ChatEntry entry) {
-        adapter.addElement(entry);
-
+    void changeName(String name) {
+        sender.setName(name);
+        //myPrefs.name().put(name);
     }
 
     @Override
@@ -100,7 +124,7 @@ public class MainActivity extends Activity implements Websocket.WebSocketCallbac
         Log.d(TAG, "Entry received");
         try {
             ChatEntry e = ChatEntry.parseChatEntry(chatObj);
-            newChatEntry(e);
+            chatlist.newChatEntry(e);
         } catch (Exception e1) {
             showMsg("ERROR: " + e1.toString());
             Log.e(TAG, "ERROR: " + e1.toString());
@@ -128,5 +152,15 @@ public class MainActivity extends Activity implements Websocket.WebSocketCallbac
     public void onConnectionError() {
         showMsg("ERROR:connection");
         Log.e(TAG, "ERROR: connection");
+    }
+
+    @Override
+    public void closeDrawer() {
+        drawer.closeDrawer(sideMenu);
+    }
+
+    @Override
+    public void openDrawer() {
+        drawer.openDrawer(sideMenu);
     }
 }
