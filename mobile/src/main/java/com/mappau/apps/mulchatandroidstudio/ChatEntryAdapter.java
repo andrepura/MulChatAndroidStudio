@@ -41,10 +41,12 @@ public class ChatEntryAdapter extends RecyclerView.Adapter<ViewWrapper>{
                 return;
             }
         }
+
         items.add(entry);
         Collections.sort(items);
 
         notifyDataSetChanged();
+
     }
 
     public void  setSender(Sender sender){

@@ -79,6 +79,7 @@ public class MainActivity extends AppCompatActivity implements Websocket.WebSock
     void initToolbar() {
         layoutManager = new LinearLayoutManager(getApplicationContext());
         layoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+
         sideMenu.setLayoutManager(layoutManager);
         sideMenu.setAdapter(adapter);
 
@@ -119,12 +120,15 @@ public class MainActivity extends AppCompatActivity implements Websocket.WebSock
         //myPrefs.name().put(name);
     }
 
+
+
     @Override
     public void onChatEntryReceived(Object chatObj) {
         Log.d(TAG, "Entry received");
         try {
             ChatEntry e = ChatEntry.parseChatEntry(chatObj);
             chatlist.newChatEntry(e);
+            chatlist.scrollDown();
         } catch (Exception e1) {
             showMsg("ERROR: " + e1.toString());
             Log.e(TAG, "ERROR: " + e1.toString());

@@ -34,6 +34,11 @@ public class ChatListFragment extends Fragment {
         recycleView.setAdapter(adapter);
     }
 
+    @UiThread
+    public void scrollDown(){
+        recycleView.scrollToPosition(adapter.getItemCount() - 1);
+    }
+
     public void setSender(Sender sender){
         adapter.setSender(sender);
     }
